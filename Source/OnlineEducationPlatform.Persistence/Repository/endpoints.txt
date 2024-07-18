@@ -1,0 +1,673 @@
+﻿Sure, let's detail each endpoint with specifications for requests, responses, permissions, and other relevant information. We'll cover the endpoints in the following categories: Authentication, Role Management, Tenant Management, and User Management.
+
+### Authentication Endpoints
+
+#### 1. Login
+
+- Endpoint: `POST /auth/login`
+- Description: Authenticates the user and returns a JWT token.
+- Request Payload:
+  ```json
+  {
+    "username": "user",
+    "password": "pass"
+  }
+  ```
+- Response:
+  ```json
+  {
+    "token": "jwt_token"
+  }
+  ```
+- Permissions:
+  - Accessible by all roles for their own login.
+- Relevant Information:
+  - The JWT token is used for authenticating subsequent requests.
+
+#### 2. Register
+
+- Endpoint: `POST /auth/register`
+- Description: Registers a new user and assigns a default role.
+- Request Payload:
+  ```json
+  {
+    "username": "user",
+    "password": "pass",
+    "email": "user@example.com"
+  }
+  ```
+- Response:
+  ```json
+  {
+    "message": "User registered successfully",
+    "role": "student"
+  }
+  ```
+- Permissions:
+  - Super Admin: Yes
+  - Tenant Admin: Yes, but only within their tenant.
+  - Others: Typically no.
+- Relevant Information:
+  - Initial role assignment can be modified later by authorized roles.
+
+### Role Management Endpoints
+
+#### 3. Get Roles
+
+- Endpoint: `GET /roles`
+- Description: Retrieves all available roles within the LMS.
+- Headers: 
+  - `Authorization: Bearer jwt_token`
+- Response:
+  ```json
+  {
+    "roles": ["admin", "instructor", "student"]
+  }
+  ```
+- Permissions:
+  - Super Admin: Yes
+  - Tenant Admin: Yes, for roles within their tenant.
+  - Others: No.
+- Relevant Information:
+  - Helps to understand the roles available for assignment.
+
+#### 4. Assign Role
+
+- Endpoint: `POST /roles/assign`
+- Description: Assigns a role to a user within a specific tenant.
+- Headers: 
+  - `Authorization: Bearer jwt_token`
+- Request Payload:
+  ```json
+  {
+    "username": "user",
+    "role": "instructor",
+    "tenantId": "tenant_123"
+  }
+  ```
+- Response:
+  ```json
+  {
+    "message": "Role assigned successfully"
+  }
+  ```
+- Permissions:
+  - Super Admin: Yes
+  - Tenant Admin: Yes, within their tenant.
+  - Others: No.
+- Relevant Information:
+  - Enables role management within the scope of the tenant's authority.
+
+#### 5. Remove Role
+
+- Endpoint: `POST /roles/remove`
+- Description: Removes a role from a user within a specific tenant.
+- Headers: 
+  - `Authorization: Bearer jwt_token`
+- Request Payload:
+  ```json
+  {
+    "username": "user",
+    "role": "instructor",
+    "tenantId": "tenant_123"
+  }
+  ```
+- Response:
+  ```json
+  {
+    "message": "Role removed successfully"
+  }
+  ```
+- Permissions:
+  - Super Admin: Yes
+  - Tenant Admin: Yes, within their tenant.
+  - Others: No.
+- Relevant Information:
+  - Ensures roles can be dynamically managed.
+
+#### 6. Get User Roles
+
+- Endpoint: `GET /roles/user`
+- Description: Retrieves the roles assigned to a user within a specific tenant.
+- Headers: 
+  - `Authorization: Bearer jwt_token`
+- Query Parameters:
+  - `username`: The user's name.
+  - `tenantId`: The tenant ID.
+- Response:
+  ```json
+  {
+    "roles": ["instructor", "student"]
+  }
+  ```
+- Permissions:
+  - Super Admin: Yes
+  - Tenant Admin: Yes, within their tenant.
+  - Others: Limited to their own roles.
+- Relevant Information:
+  - Useful for checking the roles assigned to a user.
+
+### Tenant Management Endpoints
+
+#### 7. Create Tenant
+
+- Endpoint: `POST /tenants`
+- Description: Creates a new tenant.
+- Headers: 
+  - `Authorization: Bearer jwt_token`
+- Request Payload:
+  ```json
+  {
+    "tenantName": "New Tenant"
+  }
+  ```
+- Response:
+  ```json
+  {
+    "tenantId": "tenant_123",
+    "message": "Tenant created successfully"
+  }
+  ```
+- Permissions:
+  - Super Admin: Yes
+  - Tenant Admin: No
+  - Others: No.
+- Relevant Information:
+  - Only Super Admins can create new tenants.
+
+#### 8. Get Tenants
+
+- Endpoint: `GET /tenants`
+- Description: Retrieves all tenants.
+- Headers: 
+  - `Authorization: Bearer jwt_token`
+- Response:
+  ```json
+  {
+    "tenants": [
+      {"tenantId": "tenant_123", "tenantName": "Tenant A"},
+      {"tenantId": "tenant_456", "tenantName": "Tenant B"}
+    ]
+  }
+  ```
+- Permissions:
+  - Super Admin: Yes
+  - Tenant Admin: Yes, but only their tenant details.
+  - Others: No.
+- Relevant Information:
+  - Allows visibility into existing tenants.
+
+### User Management Endpoints
+
+#### 9. Get Users
+
+- Endpoint: `GET /users`
+- Description: Retrieves all users within a specific tenant.
+- Headers: 
+  - `Authorization: Bearer jwt_token`
+- Query Parameters:
+  - `tenantId`: The tenant ID.
+- Response:
+  ```json
+  {
+    "users": [
+      {"username": "user1", "roles": ["admin"]},
+      {"username": "user2", "roles": ["student"]}
+    ]
+  }
+  ```
+- Permissions:
+  - Super Admin: Yes
+  - Tenant Admin: Yes, within their tenant.
+  - Others: No, except possibly for limited access relevant to their role.
+- Relevant Information:
+  - Critical for user management within a tenant.
+
+#### 10. Update User
+
+- Endpoint: `PUT /users/update`
+- Description: Updates user information within a specific tenant.
+- Headers: 
+  - `Authorization: Bearer jwt_token`
+- Request Payload:
+  ```json
+  {
+    "username": "user1",
+    "email": "newemail@example.com",
+    "tenantId": "tenant_123"
+  }
+  ```
+- Response:
+  ```json
+  {
+    "message": "User updated successfully"
+  }
+  ```
+- Permissions:
+  - Super Admin: Yes
+  - Tenant Admin: Yes, within their tenant.
+  - Others: No, except for updating their own profile.
+- Relevant Information:
+  - Ensures user information is kept up-to-date.
+
+---
+
+By specifying the request, response, permissions, and other relevant information for each endpoint, the system can ensure that each role has the appropriate level of access and functionality needed to perform their tasks efficiently and securely.
+
+
+
+
+
+
+Absolutely, let's start by detailing the relevant endpoints and permissions for each of the specified roles in a multitenant Learning Management System (LMS). We'll begin with the Super Admin role.
+
+### 1. Super Admin
+
+#### Description:
+The Super Admin has the highest level of access across all tenants. This role can manage the entire LMS, including creating and managing tenants, roles, users, and global settings.
+
+#### Permissions and Relevant Endpoints:
+
+Authentication Endpoints:
+- Login (`POST /auth/login`)
+  - Access: Yes
+- Register (`POST /auth/register`)
+  - Access: Yes, typically for initial setup or creating other super admin accounts.
+
+Role Management Endpoints:
+- Get Roles (`GET /roles`)
+  - Access: Yes, can view all available roles.
+- Assign Role (`POST /roles/assign`)
+  - Access: Yes, can assign roles to any user across any tenant.
+- Remove Role (`POST /roles/remove`)
+  - Access: Yes, can remove roles from any user across any tenant.
+- Get User Roles (`GET /roles/user`)
+  - Access: Yes, can retrieve roles for any user across any tenant.
+
+Tenant Management Endpoints:
+- Create Tenant (`POST /tenants`)
+  - Access: Yes, can create new tenants.
+- Get Tenants (`GET /tenants`)
+  - Access: Yes, can view all tenants.
+
+User Management Endpoints:
+- Get Users (`GET /users`)
+  - Access: Yes, can retrieve all users within any tenant.
+- Update User (`PUT /users/update`)
+  - Access: Yes, can update any user within any tenant.
+
+---
+
+### 2. Tenant Admin
+
+#### Description:
+The Tenant Admin manages all aspects of their specific tenant, including users, roles, and tenant-specific settings.
+
+#### Permissions and Relevant Endpoints:
+
+Authentication Endpoints:
+- Login (`POST /auth/login`)
+  - Access: Yes
+- Register (`POST /auth/register`)
+  - Access: Yes, can register users within their tenant.
+
+Role Management Endpoints:
+- Get Roles (`GET /roles`)
+  - Access: Yes, can view roles available within their tenant.
+- Assign Role (`POST /roles/assign`)
+  - Access: Yes, can assign roles to users within their tenant.
+- Remove Role (`POST /roles/remove`)
+  - Access: Yes, can remove roles from users within their tenant.
+- Get User Roles (`GET /roles/user`)
+  - Access: Yes, can retrieve roles for users within their tenant.
+
+Tenant Management Endpoints:
+- Create Tenant (`POST /tenants`)
+  - Access: No, can only manage their specific tenant.
+- Get Tenants (`GET /tenants`)
+  - Access: Yes, but limited to their tenant details.
+
+User Management Endpoints:
+- Get Users (`GET /users`)
+  - Access: Yes, can retrieve all users within their tenant.
+- Update User (`PUT /users/update`)
+  - Access: Yes, can update users within their tenant.
+
+---
+
+### 3. Course Creator
+
+#### Description:
+The Course Creator is responsible for creating and managing courses within a specific tenant.
+
+#### Permissions and Relevant Endpoints:
+
+Authentication Endpoints:
+- Login (`POST /auth/login`)
+  - Access: Yes
+
+Role Management Endpoints:
+- Get Roles (`GET /roles`)
+  - Access: No
+- Assign Role (`POST /roles/assign`)
+  - Access: No
+- Remove Role (`POST /roles/remove`)
+  - Access: No
+- Get User Roles (`GET /roles/user`)
+  - Access: No
+
+Tenant Management Endpoints:
+- Create Tenant (`POST /tenants`)
+  - Access: No
+- Get Tenants (`GET /tenants`)
+  - Access: No
+
+User Management Endpoints:
+- Get Users (`GET /users`)
+  - Access: Limited, primarily to view users relevant to their courses.
+- Update User (`PUT /users/update`)
+  - Access: Limited, typically not applicable unless tied to course-specific information.
+
+Course Management Endpoints (Assumed):
+- Create Course (`POST /courses`)
+  - Access: Yes, can create new courses within their tenant.
+- Get Courses (`GET /courses`)
+  - Access: Yes, can view all courses they have created.
+- Update Course (`PUT /courses/{courseId}`)
+  - Access: Yes, can update courses they have created.
+- Delete Course (`DELETE /courses/{courseId}`)
+  - Access: Yes, can delete courses they have created.
+
+---
+
+### 4. Instructor
+
+#### Description:
+The Instructor manages course content, student interactions, and grading within specific courses.
+
+#### Permissions and Relevant Endpoints:
+
+Authentication Endpoints:
+- Login (`POST /auth/login`)
+  - Access: Yes
+
+Role Management Endpoints:
+- Get Roles (`GET /roles`)
+  - Access: No
+- Assign Role (`POST /roles/assign`)
+  - Access: No
+- Remove Role (`POST /roles/remove`)
+  - Access: No
+- Get User Roles (`GET /roles/user`)
+  - Access: Limited, typically for their own role or possibly their TAs.
+
+Tenant Management Endpoints:
+- Create Tenant (`POST /tenants`)
+  - Access: No
+- Get Tenants (`GET /tenants`)
+  - Access: No
+
+User Management Endpoints:
+- Get Users (`GET /users`)
+  - Access: Limited, primarily to view students and TAs in their courses.
+- Update User (`PUT /users/update`)
+  - Access: Limited, typically not applicable unless tied to course-specific information.
+
+Course Management Endpoints (Assumed):
+- Create Course (`POST /courses`)
+  - Access: No, unless combined role with Course Creator.
+- Get Courses (`GET /courses`)
+  - Access: Yes, can view and manage courses they are instructing.
+- Update Course (`PUT /courses/{courseId}`)
+  - Access: Limited to courses they are instructing.
+- Delete Course (`DELETE /courses/{courseId}`)
+  - Access: No
+
+Student Interaction Endpoints (Assumed):
+- Grade Assignment (`POST /courses/{courseId}/grade`)
+  - Access: Yes, can grade student assignments.
+- Post Announcement (`POST /courses/{courseId}/announcement`)
+  - Access: Yes, can post announcements for their courses.
+
+---
+
+### 5. Student
+
+#### Description:
+The Student interacts with the LMS primarily to view and participate in courses, submit assignments, and receive grades.
+
+#### Permissions and Relevant Endpoints:
+
+Authentication Endpoints:
+- Login (`POST /auth/login`)
+  - Access: Yes
+- Register (`POST /auth/register`)
+  - Access: Yes, for self-registration.
+
+Role Management Endpoints:
+- Get Roles (`GET /roles`)
+  - Access: No
+- Assign Role (`POST /roles/assign`)
+  - Access: No
+- Remove Role (`POST /roles/remove`)
+  - Access: No
+- Get User Roles (`GET /roles/user`)
+  - Access: Yes, but only to view their own roles.
+
+Tenant Management Endpoints:
+- Create Tenant (`POST /tenants`)
+  - Access: No
+- Get Tenants (`GET /tenants`)
+  - Access: No
+
+User Management Endpoints:
+- Get Users (`GET /users`)
+  - Access: No, except possibly to view their own profile.
+- Update User (`PUT /users/update`)
+  - Access: Limited, typically to update their own profile information.
+
+Course Interaction Endpoints (Assumed):
+- Enroll in Course (`POST /courses/{courseId}/enroll`)
+  - Access: Yes, can enroll in available courses.
+- View Courses (`GET /courses`)
+  - Access: Yes, can view courses they are enrolled in.
+- Submit Assignment (`POST /courses/{courseId}/submit`)
+  - Access: Yes, can submit assignments for their courses.
+- View Grades (`GET /courses/{courseId}/grades`)
+  - Access: Yes, can view their own grades.
+
+---
+
+By clearly defining the endpoints and permissions for each role, the LMS ensures that each user can access only the functionalities relevant to their responsibilities, enhancing security and efficiency within the system.
+
+
+
+
+### 6. Teaching Assistant
+
+#### Description:
+The Teaching Assistant (TA) supports instructors by managing course content, assisting with grading, and interacting with students within specific courses.
+
+#### Permissions and Relevant Endpoints:
+
+Authentication Endpoints:
+- Login (`POST /auth/login`)
+  - Access: Yes
+
+Role Management Endpoints:
+- Get Roles (`GET /roles`)
+  - Access: No
+- Assign Role (`POST /roles/assign`)
+  - Access: No
+- Remove Role (`POST /roles/remove`)
+  - Access: No
+- Get User Roles (`GET /roles/user`)
+  - Access: Limited, typically for their own role and possibly the roles of students in their courses.
+
+Tenant Management Endpoints:
+- Create Tenant (`POST /tenants`)
+  - Access: No
+- Get Tenants (`GET /tenants`)
+  - Access: No
+
+User Management Endpoints:
+- Get Users (`GET /users`)
+  - Access: Limited, primarily to view students in their courses.
+- Update User (`PUT /users/update`)
+  - Access: Limited, typically not applicable unless tied to course-specific information.
+
+Course Management Endpoints (Assumed):
+- Create Course (`POST /courses`)
+  - Access: No
+- Get Courses (`GET /courses`)
+  - Access: Yes, can view and assist in managing courses they are assigned to.
+- Update Course (`PUT /courses/{courseId}`)
+  - Access: Limited, to assist in updating courses they are assigned to.
+- Delete Course (`DELETE /courses/{courseId}`)
+  - Access: No
+
+Student Interaction Endpoints (Assumed):
+- Grade Assignment (`POST /courses/{courseId}/grade`)
+  - Access: Yes, can assist in grading student assignments.
+- Post Announcement (`POST /courses/{courseId}/announcement`)
+  - Access: Yes, can assist in posting announcements for their courses.
+
+---
+
+### 7. Support Staff
+
+#### Description:
+Support Staff assist with technical and administrative support within the LMS. Their access is generally limited to troubleshooting and providing help to users.
+
+#### Permissions and Relevant Endpoints:
+
+Authentication Endpoints:
+- Login (`POST /auth/login`)
+  - Access: Yes
+
+Role Management Endpoints:
+- Get Roles (`GET /roles`)
+  - Access: No
+- Assign Role (`POST /roles/assign`)
+  - Access: No
+- Remove Role (`POST /roles/remove`)
+  - Access: No
+- Get User Roles (`GET /roles/user`)
+  - Access: No
+
+Tenant Management Endpoints:
+- Create Tenant (`POST /tenants`)
+  - Access: No
+- Get Tenants (`GET /tenants`)
+  - Access: No
+
+User Management Endpoints:
+- Get Users (`GET /users`)
+  - Access: Limited, primarily to assist users with issues.
+- Update User (`PUT /users/update`)
+  - Access: No, unless resolving specific support tickets that require such action.
+
+Support Endpoints (Assumed):
+- Create Support Ticket (`POST /support/tickets`)
+  - Access: Yes, can create tickets for user issues.
+- Get Support Tickets (`GET /support/tickets`)
+  - Access: Yes, can view and manage support tickets.
+- Update Support Ticket (`PUT /support/tickets/{ticketId}`)
+  - Access: Yes, can update the status and details of support tickets.
+
+---
+
+### 8. Quality Assurance
+
+#### Description:
+Quality Assurance (QA) staff ensure that the LMS functions correctly and meets quality standards. They might test various features, report bugs, and suggest improvements.
+
+#### Permissions and Relevant Endpoints:
+
+Authentication Endpoints:
+- Login (`POST /auth/login`)
+  - Access: Yes
+
+Role Management Endpoints:
+- Get Roles (`GET /roles`)
+  - Access: No
+- Assign Role (`POST /roles/assign`)
+  - Access: No
+- Remove Role (`POST /roles/remove`)
+  - Access: No
+- Get User Roles (`GET /roles/user`)
+  - Access: No
+
+Tenant Management Endpoints:
+- Create Tenant (`POST /tenants`)
+  - Access: No
+- Get Tenants (`GET /tenants`)
+  - Access: No
+
+User Management Endpoints:
+- Get Users (`GET /users`)
+  - Access: No
+- Update User (`PUT /users/update`)
+  - Access: No
+
+Quality Assurance Endpoints (Assumed):
+- Create Bug Report (`POST /qa/bug-reports`)
+  - Access: Yes, can create reports for any bugs or issues found.
+- Get Bug Reports (`GET /qa/bug-reports`)
+  - Access: Yes, can view all bug reports.
+- Update Bug Report (`PUT /qa/bug-reports/{reportId}`)
+  - Access: Yes, can update the status and details of bug reports.
+
+---
+
+### 9. Compliance Officer
+
+#### Description:
+The Compliance Officer ensures that the LMS adheres to legal and regulatory standards. They monitor activities, review audits, and ensure data protection policies are followed.
+
+#### Permissions and Relevant Endpoints:
+
+Authentication Endpoints:
+- Login (`POST /auth/login`)
+  - Access: Yes
+
+Role Management Endpoints:
+- Get Roles (`GET /roles`)
+  - Access: No
+- Assign Role (`POST /roles/assign`)
+  - Access: No
+- Remove Role (`POST /roles/remove`)
+  - Access: No
+- Get User Roles (`GET /roles/user`)
+  - Access: No
+
+Tenant Management Endpoints:
+- Create Tenant (`POST /tenants`)
+  - Access: No
+- Get Tenants (`GET /tenants`)
+  - Access: No
+
+User Management Endpoints:
+- Get Users (`GET /users`)
+  - Access: No
+- Update User (`PUT /users/update`)
+  - Access: No
+
+Compliance Endpoints (Assumed):
+- Create Audit Report (`POST /compliance/audits`)
+  - Access: Yes, can create reports for compliance audits.
+- Get Audit Reports (`GET /compliance/audits`)
+  - Access: Yes, can view all compliance audit reports.
+- Update Audit Report (`PUT /compliance/audits/{reportId}`)
+  - Access: Yes, can update the status and details of compliance audit reports.
+
+Data Protection Endpoints (Assumed):
+- Request Data Deletion (`POST /compliance/data-deletion`)
+  - Access: Yes, can request data deletion for compliance.
+- View Data Protection Policies (`GET /compliance/policies`)
+  - Access: Yes, can view data protection policies.
+
+---
+
+By clearly defining the endpoints and permissions for each role, the LMS can ensure that each user can access only the functionalities relevant to their responsibilities, enhancing security and efficiency within the system.
+

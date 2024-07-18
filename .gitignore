@@ -396,3 +396,9 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+*.md
+/Source/OnlineEducationPlatform/appsettings.Development.json
+/Source/OnlineEducationPlatform/appsettings.json
+/Source/OnlineEducationPlatform/local.settings.json
+*.sh
+/Source/OnlineEducationPlatform/appsettings.Production.json
